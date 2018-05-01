@@ -13,16 +13,18 @@ class Car {
 	}
 }
 
+let car;
+
 beforeEach() => {
-	console.log('a');
+	car = new Car();
 });
 describe('Car', () => {
 	it('can park', () => {
-		const car = new Car();
+	//	const car = new Car();
 		assert.equal(car.park(),'stopped');	
 	});
 	it('can drive', () => {
-		const car = new Car();
+	//	const car = new Car();
 		assert.equal(car.drive(),'vroom');
 	});
 
