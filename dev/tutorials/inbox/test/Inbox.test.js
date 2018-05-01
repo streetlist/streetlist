@@ -1,7 +1,13 @@
 const assert = require('assert'); //assertions about test
 const ganache = require('ganache-cli');
 const Web3 = require('web3');
-const web3 = new Web3(ganache.provider()); 
+
+
+// UPDATE THESE TWO LINES RIGHT HERE!!!!! <-----------------
+const provider = ganache.provider();
+const web3 = new Web3(provider);
+
+//const web3 = new Web3(ganache.provider()); 
 const { interface, bytecode } = require('../compile');
 
 
@@ -32,7 +38,12 @@ beforeEach(async () => {
 //	});
 	inbox = await new web3.eth.Contract(JSON.parse(interface))
 		.deploy({ data: bytecode, arguments: ['Hi there!'] })
-//		.send({ from: accounts[0], gas: '1000000' })
+		.send({ from: accounts[0], gas: '1000000' })
+
+
+	// ADD THIS ONE LINE RIGHT HERE!!!!! <---------------------
+	inbox.setProvider(provider);
+
 });
 describe('Inbox', () => {
 	it('deploys a contract', () => {
@@ -41,12 +52,18 @@ describe('Inbox', () => {
 //		console.log(inbox)
 		assert.ok(inbox.options.address);
 	});
-	/*
-	it('can drive', () => {
+	it('has a default message', async () => {
 	//	const car = new Car();
-		assert.equal(car.drive(),'vroom');
+		const message = await inbox.methods.message().call();
+		assert.equal(message,'Hi there!');
 	});
-	*/
+	it('can change the message', async () => {
+		//      const car = new Car();
+		await inbox.methods.setMessage('bye').send({ from: accounts[0] });
+		const message = await inbox.methods.message().call();
+		assert.equal(message,'bye');
+	});
+
 });
 
 
@@ -55,30 +72,30 @@ describe('Inbox', () => {
 
 
 /*
-class Car {
-	park() {
-		return 'stopped';
-	}
+   class Car {
+   park() {
+   return 'stopped';
+   }
 
-	drive() {
-		return 'vroom';
-	}
-}
+   drive() {
+   return 'vroom';
+   }
+   }
 
-let car;
+   let car;
 
-beforeEach(() => {
-	car = new Car();
+   beforeEach(() => {
+   car = new Car();
+   });
+   describe('Car', () => {
+   it('can park', () => {
+//	const car = new Car();
+assert.equal(car.park(),'stopped');	
 });
-describe('Car', () => {
-	it('can park', () => {
-	//	const car = new Car();
-		assert.equal(car.park(),'stopped');	
-	});
-	it('can drive', () => {
-	//	const car = new Car();
-		assert.equal(car.drive(),'vroom');
-	});
+it('can drive', () => {
+//	const car = new Car();
+assert.equal(car.drive(),'vroom');
+});
 
 });
 */
